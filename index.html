@@ -1,24 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>To-Do List</title>
-    <link href="src/main.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href='https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css' rel='stylesheet'>
 </head>
-
 <body class="bg-gray-100 p-6">
     <div class="max-w-4xl mx-auto bg-white p-5 rounded-lg shadow-md">
         <h1 class="text-xl font-bold text-center mb-4">To-Do List</h1>
-
+        
         <!-- Filters -->
         <div class="flex justify-between mb-4">
             <div>
                 <label for="status-filter" class="mr-2">Status:</label>
-                <select id="status-filter"
-                    class="p-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300">
+                <select id="status-filter" class="p-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300">
                     <option value="All">All</option>
                     <option value="Completed">Completed</option>
                     <option value="Pending">Pending</option>
@@ -26,8 +23,7 @@
             </div>
             <div>
                 <label for="priority-filter" class="mr-2">Priority:</label>
-                <select id="priority-filter"
-                    class="p-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300">
+                <select id="priority-filter" class="p-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300">
                     <option value="All">All</option>
                     <option value="Low">Low</option>
                     <option value="Medium">Medium</option>
@@ -38,11 +34,8 @@
 
         <!-- Task Input -->
         <form id="todo-form" class="flex mb-4">
-            <input type="text" id="task-input"
-                class="flex-grow p-2 border rounded-l-lg focus:outline-none focus:ring focus:ring-blue-300"
-                placeholder="Add a new task" required>
-            <select id="priority-input"
-                class="ml-2 p-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300">
+            <input type="text" id="task-input" class="flex-grow p-2 border rounded-l-lg focus:outline-none focus:ring focus:ring-blue-300" placeholder="Add a new task" required>
+            <select id="priority-input" class="ml-2 p-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300">
                 <option value="Low">Low</option>
                 <option value="Medium">Medium</option>
                 <option value="High">High</option>
@@ -51,18 +44,18 @@
         </form>
 
         <!-- Task Table -->
-        <table class="min-w-full border border-gray-300">
-            <thead>
+        <table class="min-w-full">
+            <thead class="border-b-2 border-gray-300">
                 <tr class="bg-gray-200 text-gray-700">
-                    <th class="border border-gray-300 p-2">ID</th>
-                    <th class="border border-gray-300 p-2">Task</th>
-                    <th class="border border-gray-300 p-2">Date</th>
-                    <th class="border border-gray-300 p-2">Status</th>
-                    <th class="border border-gray-300 p-2">Priority</th>
-                    <th class="border border-gray-300 p-2">Actions</th>
+                    <th class="p-2 text-center">ID</th>
+                    <th class="p-2 text-center">Task</th>
+                    <th class="p-2 text-center">Date</th>
+                    <th class="p-2 text-center">Status</th>
+                    <th class="p-2 text-center">Priority</th>
+                    <th class="p-2 text-center">Actions</th>
                 </tr>
             </thead>
-            <tbody id="todo-list" class="bg-white">
+            <tbody id="todo-list" class=" text-center">
                 <!-- Todo items will be added here -->
             </tbody>
         </table>
@@ -72,11 +65,8 @@
     <div id="edit-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-gray-800 bg-opacity-50">
         <div class="bg-white rounded-lg p-5 w-1/3">
             <h2 class="text-xl font-bold mb-4">Edit Task</h2>
-            <input type="text" id="edit-task-input"
-                class="w-full p-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
-                placeholder="Edit task" required>
-            <select id="edit-priority-input"
-                class="mt-2 w-full p-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300">
+            <input type="text" id="edit-task-input" class="w-full p-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300" placeholder="Edit task" required>
+            <select id="edit-priority-input" class="mt-2 w-full p-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300">
                 <option value="Low">Low</option>
                 <option value="Medium">Medium</option>
                 <option value="High">High</option>
@@ -94,15 +84,161 @@
             <h2 class="text-xl font-bold mb-4">Confirm Deletion</h2>
             <p>Are you sure you want to delete this task?</p>
             <div class="mt-4 flex justify-end">
-                <button id="confirm-delete-btn"
-                    class="bg-red-500 text-white p-2 rounded-lg hover:bg-red-600">Delete</button>
-                <button id="cancel-delete-btn"
-                    class="bg-gray-500 text-white p-2 rounded-lg hover:bg-gray-600 ml-2">Cancel</button>
+                <button id="confirm-delete-btn" class="bg-red-500 text-white p-2 rounded-lg hover:bg-red-600">Delete</button>
+                <button id="cancel-delete-btn" class="bg-gray-500 text-white p-2 rounded-lg hover:bg-gray-600 ml-2">Cancel</button>
             </div>
         </div>
     </div>
 
-    <script src="./src/script.js"></script>
-</body>
+    <script>
+        let todoId = 1;
+        let currentEditId = null;
+        let taskToDeleteId = null;
 
+        const form = document.getElementById('todo-form');
+        const taskInput = document.getElementById('task-input');
+        const priorityInput = document.getElementById('priority-input');
+        const todoList = document.getElementById('todo-list');
+        const editModal = document.getElementById('edit-modal');
+        const editTaskInput = document.getElementById('edit-task-input');
+        const editPriorityInput = document.getElementById('edit-priority-input');
+        const saveBtn = document.getElementById('save-btn');
+        const closeBtn = document.getElementById('close-btn');
+        const deleteModal = document.getElementById('delete-modal');
+        const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+        const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+        const statusFilter = document.getElementById('status-filter');
+        const priorityFilter = document.getElementById('priority-filter');
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const taskText = taskInput.value.trim();
+            const taskDate = new Date().toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            }); // Format: "09 Oct 2024"
+            const taskPriority = priorityInput.value;
+
+            if (taskText) {
+                addTaskToTable(todoId, taskText, taskDate, taskPriority);
+                todoId++;
+                taskInput.value = '';
+                priorityInput.value = 'Low'; // Reset priority input
+            }
+        });
+
+        function addTaskToTable(id, text, date, priority) {
+            const tr = document.createElement('tr');
+            tr.className = 'border-b border-gray-300';
+            tr.setAttribute('data-status', 'Pending'); // Set default status
+            tr.innerHTML = `
+                <td class="p-2 text-center">${id}</td>
+                <td class="p-2">${text}</td>
+                <td class="p-2 text-center">${date}</td>
+                <td class="p-2 text-center" id="status-${id}">Pending</td>
+                <td class="p-2 text-center">${priority}</td>
+                <td class="p-2 text-center">
+                    <button class="text-green-500 hover:text-green-700" onclick="completeTask(${id})">
+                        <i class='bx bx-check'></i>
+                    </button>
+                    <button class="text-blue-500 hover:text-blue-700" onclick="openEditModal(${id})">
+                        <i class='bx bx-edit'></i>
+                    </button>
+                    <button class="text-red-500 hover:text-red-700" onclick="openDeleteModal(${id})">
+                        <i class='bx bx-trash'></i>
+                    </button>
+                </td>
+            `;
+            todoList.appendChild(tr);
+            filterTasks();
+        }
+
+        function completeTask(id) {
+            const statusCell = document.getElementById(`status-${id}`);
+            const row = document.querySelector(`tr[data-status="${statusCell.innerText}"]`);
+            if (row) {
+                const newStatus = statusCell.innerText === "Pending" ? "Completed" : "Pending";
+                statusCell.innerText = newStatus;
+                row.setAttribute('data-status', newStatus); // Update row status
+                filterTasks(); // Re-filter the tasks after completion
+            }
+        }
+
+        function openEditModal(id) {
+            currentEditId = id;
+            const row = document.querySelector(`tr[data-status="Pending"]`) || document.querySelector(`tr[data-status="Completed"]`);
+            if (row) {
+                const taskText = row.cells[1].innerText;
+                const taskPriority = row.cells[4].innerText;
+                editTaskInput.value = taskText;
+                editPriorityInput.value = taskPriority;
+                editModal.classList.remove('hidden');
+            }
+        }
+
+        saveBtn.addEventListener('click', () => {
+            const updatedText = editTaskInput.value.trim();
+            const updatedPriority = editPriorityInput.value;
+
+            if (updatedText && currentEditId) {
+                const row = document.querySelector(`tr[data-status="Pending"]`) || document.querySelector(`tr[data-status="Completed"]`);
+                if (row) {
+                    row.cells[1].innerText = updatedText;
+                    row.cells[4].innerText = updatedPriority;
+                }
+                closeEditModal();
+            }
+        });
+
+        closeBtn.addEventListener('click', closeEditModal);
+        function closeEditModal() {
+            editModal.classList.add('hidden');
+            currentEditId = null;
+        }
+
+        function openDeleteModal(id) {
+            taskToDeleteId = id;
+            deleteModal.classList.remove('hidden');
+        }
+
+        confirmDeleteBtn.addEventListener('click', () => {
+            const row = document.querySelector(`tr[data-status="Pending"]`) || document.querySelector(`tr[data-status="Completed"]`);
+            if (row) {
+                row.remove();
+            }
+            closeDeleteModal();
+        });
+
+        cancelDeleteBtn.addEventListener('click', closeDeleteModal);
+        function closeDeleteModal() {
+            deleteModal.classList.add('hidden');
+            taskToDeleteId = null;
+        }
+
+        // Filtering tasks based on status and priority
+        statusFilter.addEventListener('change', filterTasks);
+        priorityFilter.addEventListener('change', filterTasks);
+
+        function filterTasks() {
+            const statusValue = statusFilter.value;
+            const priorityValue = priorityFilter.value;
+
+            const rows = todoList.querySelectorAll('tr');
+            rows.forEach(row => {
+                const status = row.getAttribute('data-status');
+                const priority = row.cells[4].innerText;
+
+                const showByStatus = (statusValue === "All" || status === statusValue);
+                const showByPriority = (priorityValue === "All" || priority === priorityValue);
+
+                if (showByStatus && showByPriority) {
+                    row.classList.remove('hidden');
+                } else {
+                    row.classList.add('hidden');
+                }
+            });
+        }
+    </script>
+</body>
 </html>
