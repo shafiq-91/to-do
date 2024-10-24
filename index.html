@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,12 +8,16 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href='https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css' rel='stylesheet'>
 </head>
+
 <body class="bg-gray-100 p-6">
     <div class="max-w-4xl mx-auto bg-white p-5 rounded-lg shadow-md">
         <h1 class="text-xl font-bold text-center mb-4">To-Do List</h1>
         <form id="todo-form" class="flex mb-4">
-            <input type="text" id="task-input" class="flex-grow p-2 border rounded-l-lg focus:outline-none focus:ring focus:ring-blue-300" placeholder="Add a new task" required>
-            <select id="priority-input" class="ml-2 p-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300">
+            <input type="text" id="task-input"
+                class="flex-grow p-2 border rounded-l-lg focus:outline-none focus:ring focus:ring-blue-300"
+                placeholder="Add a new task" required>
+            <select id="priority-input"
+                class="ml-2 p-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300">
                 <option value="Low">Low</option>
                 <option value="Medium">Medium</option>
                 <option value="High">High</option>
@@ -36,6 +41,41 @@
         </table>
     </div>
 
+    <!-- Edit Modal -->
+    <div id="edit-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-gray-800 bg-opacity-50">
+        <div class="bg-white rounded-lg p-5 w-1/3">
+            <h2 class="text-xl font-bold mb-4">Edit Task</h2>
+            <input type="text" id="edit-task-input"
+                class="w-full p-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                placeholder="Edit task" required>
+            <select id="edit-priority-input"
+                class="mt-2 w-full p-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300">
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+            </select>
+            <div class="mt-4 flex justify-end">
+                <button id="save-btn" class="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600">Save</button>
+                <button id="close-btn" class="bg-red-500 text-white p-2 rounded-lg hover:bg-red-600 ml-2">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-gray-800 bg-opacity-50">
+        <div class="bg-white rounded-lg p-5 w-1/3">
+            <h2 class="text-xl font-bold mb-4">Confirm Deletion</h2>
+            <p>Are you sure you want to delete this task?</p>
+            <div class="mt-4 flex justify-end">
+                <button id="confirm-delete-btn"
+                    class="bg-red-500 text-white p-2 rounded-lg hover:bg-red-600">Delete</button>
+                <button id="cancel-delete-btn"
+                    class="bg-gray-500 text-white p-2 rounded-lg hover:bg-gray-600 ml-2">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <script src="src/script.js"></script>
 </body>
+
 </html>
