@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body class="bg-gray-100 p-6">
+    <div class="max-w-4xl mx-auto bg-white p-5 rounded-lg shadow-md">
+        <h1 class="text-xl font-bold text-center mb-4">To-Do List</h1>
+        <form id="todo-form" class="flex mb-4">
+            <input type="text" id="task-input" class="flex-grow p-2 border rounded-l-lg focus:outline-none focus:ring focus:ring-blue-300" placeholder="Add a new task" required>
+            <input type="date" id="date-input" class="ml-2 p-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300" required>
+            <select id="priority-input" class="ml-2 p-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300">
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+            </select>
+            <button type="submit" class="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 ml-2">Add</button>
+        </form>
+        <table class="min-w-full border border-gray-300">
+            <thead>
+                <tr class="bg-gray-200 text-gray-700">
+                    <th class="border border-gray-300 p-2">ID</th>
+                    <th class="border border-gray-300 p-2">Task</th>
+                    <th class="border border-gray-300 p-2">Date</th>
+                    <th class="border border-gray-300 p-2">Status</th>
+                    <th class="border border-gray-300 p-2">Priority</th>
+                    <th class="border border-gray-300 p-2">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="todo-list" class="bg-white">
+                <!-- Todo items will be added here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        let todoId = 1;
+
+        const form = document.getElementById('todo-form');
+        const taskInput = document.getElementById('task-input');
+        const dateInput = document.getElementById('date-input');
+        const priorityInput = document.getElementById('priority-input');
+        const todoList = document.getElementById('todo-list');
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const taskText = taskInput.value.trim();
+            const taskDate = dateInput.value;
+            const taskPriority = priorityInput.value;
+
+            if (taskText) {
+                const tr = document.createElement('tr');
+                tr.className = 'border border-gray-300';
+                tr.innerHTML = `
+                    <td class="border border-gray-300 p-2 text-center">${todoId}</td>
+                    <td class="border border-gray-300 p-2">${taskText}</td>
+                    <td class="border border-gray-300 p-2 text-center">${taskDate}</td>
+                    <td class="border border-gray-300 p-2 text-center" id="status-${todoId}">Pending</td>
+                    <td class="border border-gray-300 p-2 text-center">${taskPriority}</td>
+                    <td class="border border-gray-300 p-2 text-center">
+                        <button class="text-green-500 hover:text-green-700" onclick="completeTask(${todoId})">
+                            <i class='bx bx-check'></i>
+                        </button>
+                        <button class="text-blue-500 hover:text-blue-700" onclick="editTask(${todoId})">
+                            <i class='bx bx-edit'></i>
+                        </button>
+                        <button class="text-red-500 hover:text-red-700" onclick="removeTask(${todoId})">
+                            <i class='bx bx-trash'></i>
+                        </button>
+                    </td>
+                `;
+                todoList.appendChild(tr);
+                todoId++;
+                taskInput.value = '';
+                dateInput.value = '';
+                priorityInput.value = 'Low';
+            }
+        });
+
+        function completeTask(id) {
+            const statusCell = document.getElementById(`status-${id}`);
+            if (statusCell.innerText === "Pending") {
+                statusCell.innerText = "Completed";
+            } else {
+                statusCell.innerText = "Pending";
+            }
+        }
+
+        function editTask(id) {
+            const row = document.querySelector(`tr:nth-child(${id})`);
+            const taskCell = row.children[1];
+            const dateCell = row.children[2];
+            const priorityCell = row.children[4];
+
+            const newTask = prompt("Edit task:", taskCell.innerText);
+            const newDate = prompt("Edit date:", dateCell.innerText);
+            const newPriority = prompt("Edit priority (Low, Medium, High):", priorityCell.innerText);
+
+            if (newTask) taskCell.innerText = newTask;
+            if (newDate) dateCell.innerText = newDate;
+            if (newPriority) priorityCell.innerText = newPriority;
+        }
+
+        function removeTask(id) {
+            const row = document.querySelector(`tr:nth-child(${id})`);
+            todoList.removeChild(row);
+        }
+    </script>
+</body>
+</html>
