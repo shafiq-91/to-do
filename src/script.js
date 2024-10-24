@@ -1,35 +1,70 @@
-document.getElementById('addButton').addEventListener('click', function() {
-    const taskInput = document.getElementById('taskInput');
-    const taskText = taskInput.value;
+let todoId = 1;
 
-    if (taskText) {
-        const taskList = document.getElementById('taskList');
-        const li = document.createElement('li');
-        const currentDate = new Date().toLocaleDateString(); // Get current date
+        const form = document.getElementById('todo-form');
+        const taskInput = document.getElementById('task-input');
+        const priorityInput = document.getElementById('priority-input');
+        const todoList = document.getElementById('todo-list');
 
-        li.className = "flex justify-between items-center p-2 border-b border-gray-200";
-        li.innerHTML = `
-            <span class="task flex-grow">
-                ${taskText} <span class="text-gray-400 text-sm">(${currentDate})</span>
-            </span>
-            <div>
-                <button class="complete-button text-blue-500 hover:text-blue-700">✔</button>
-                <button class="delete-button text-red-500 hover:text-red-700 ml-2">✖</button>
-            </div>
-        `;
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const taskText = taskInput.value.trim();
+            const taskDate = new Date().toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            }); // Format: "09 Oct 2024"
+            const taskPriority = priorityInput.value;
 
-        // Complete task functionality
-        li.querySelector('.complete-button').addEventListener('click', function() {
-            li.querySelector('.task').classList.toggle('line-through');
-            li.querySelector('.complete-button').disabled = true; // Disable button after completing
+            if (taskText) {
+                const tr = document.createElement('tr');
+                tr.className = 'border border-gray-300';
+                tr.innerHTML = `
+                    <td class="border border-gray-300 p-2 text-center">${todoId}</td>
+                    <td class="border border-gray-300 p-2">${taskText}</td>
+                    <td class="border border-gray-300 p-2 text-center">${taskDate}</td>
+                    <td class="border border-gray-300 p-2 text-center" id="status-${todoId}">Pending</td>
+                    <td class="border border-gray-300 p-2 text-center">${taskPriority}</td>
+                    <td class="border border-gray-300 p-2 text-center">
+                        <button class="text-green-500 hover:text-green-700" onclick="completeTask(${todoId})">
+                            <i class='bx bx-check'></i>
+                        </button>
+                        <button class="text-blue-500 hover:text-blue-700" onclick="editTask(${todoId})">
+                            <i class='bx bx-edit'></i>
+                        </button>
+                        <button class="text-red-500 hover:text-red-700" onclick="removeTask(${todoId})">
+                            <i class='bx bx-trash'></i>
+                        </button>
+                    </td>
+                `;
+                todoList.appendChild(tr);
+                todoId++;
+                taskInput.value = '';
+                priorityInput.value = 'Low'; // Reset priority input
+            }
         });
 
-        // Delete task functionality
-        li.querySelector('.delete-button').addEventListener('click', function() {
-            taskList.removeChild(li);
-        });
+        function completeTask(id) {
+            const statusCell = document.getElementById(`status-${id}`);
+            if (statusCell.innerText === "Pending") {
+                statusCell.innerText = "Completed";
+            } else {
+                statusCell.innerText = "Pending";
+            }
+        }
 
-        taskList.appendChild(li);
-        taskInput.value = '';
-    }
-});
+        function editTask(id) {
+            const row = document.querySelector(`tr:nth-child(${id})`);
+            const taskCell = row.children[1];
+            const priorityCell = row.children[4];
+
+            const newTask = prompt("Edit task:", taskCell.innerText);
+            const newPriority = prompt("Edit priority (Low, Medium, High):", priorityCell.innerText);
+
+            if (newTask) taskCell.innerText = newTask;
+            if (newPriority) priorityCell.innerText = newPriority;
+        }
+
+        function removeTask(id) {
+            const row = document.querySelector(`tr:nth-child(${id})`);
+            todoList.removeChild(row);
+        }
