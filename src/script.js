@@ -14,6 +14,8 @@ const closeBtn = document.getElementById('close-btn');
 const deleteModal = document.getElementById('delete-modal');
 const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
 const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+const statusFilter = document.getElementById('status-filter');
+const priorityFilter = document.getElementById('priority-filter');
 
 form.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -26,78 +28,121 @@ form.addEventListener('submit', (e) => {
     const taskPriority = priorityInput.value;
 
     if (taskText) {
-        const tr = document.createElement('tr');
-        tr.className = 'border border-gray-300';
-        tr.innerHTML = `
-                    <td class="border border-gray-300 p-2 text-center">${todoId}</td>
-                    <td class="border border-gray-300 p-2">${taskText}</td>
-                    <td class="border border-gray-300 p-2 text-center">${taskDate}</td>
-                    <td class="border border-gray-300 p-2 text-center" id="status-${todoId}">Pending</td>
-                    <td class="border border-gray-300 p-2 text-center">${taskPriority}</td>
-                    <td class="border border-gray-300 p-2 text-center">
-                        <button class="text-green-500 hover:text-green-700" onclick="completeTask(${todoId})">
-                            <i class='bx bx-check'></i>
-                        </button>
-                        <button class="text-blue-500 hover:text-blue-700" onclick="openEditModal(${todoId})">
-                            <i class='bx bx-edit'></i>
-                        </button>
-                        <button class="text-red-500 hover:text-red-700" onclick="openDeleteModal(${todoId})">
-                            <i class='bx bx-trash'></i>
-                        </button>
-                    </td>
-                `;
-        todoList.appendChild(tr);
+        addTaskToTable(todoId, taskText, taskDate, taskPriority);
         todoId++;
         taskInput.value = '';
         priorityInput.value = 'Low'; // Reset priority input
     }
 });
 
+function addTaskToTable(id, text, date, priority) {
+    const tr = document.createElement('tr');
+    tr.className = 'border border-gray-300';
+    tr.setAttribute('data-status', 'Pending'); // Set default status
+    tr.innerHTML = `
+                <td class="border border-gray-300 p-2 text-center">${id}</td>
+                <td class="border border-gray-300 p-2">${text}</td>
+                <td class="border border-gray-300 p-2 text-center">${date}</td>
+                <td class="border border-gray-300 p-2 text-center" id="status-${id}">Pending</td>
+                <td class="border border-gray-300 p-2 text-center">${priority}</td>
+                <td class="border border-gray-300 p-2 text-center">
+                    <button class="text-green-500 hover:text-green-700" onclick="completeTask(${id})">
+                        <i class='bx bx-check'></i>
+                    </button>
+                    <button class="text-blue-500 hover:text-blue-700" onclick="openEditModal(${id})">
+                        <i class='bx bx-edit'></i>
+                    </button>
+                    <button class="text-red-500 hover:text-red-700" onclick="openDeleteModal(${id})">
+                        <i class='bx bx-trash'></i>
+                    </button>
+                </td>
+            `;
+    todoList.appendChild(tr);
+    filterTasks();
+}
+
 function completeTask(id) {
     const statusCell = document.getElementById(`status-${id}`);
-    statusCell.innerText = statusCell.innerText === "Pending" ? "Completed" : "Pending";
+    const row = document.querySelector(`tr[data-status="${statusCell.innerText}"]`);
+    if (row) {
+        const newStatus = statusCell.innerText === "Pending" ? "Completed" : "Pending";
+        statusCell.innerText = newStatus;
+        row.setAttribute('data-status', newStatus); // Update row status
+        filterTasks(); // Re-filter the tasks after completion
+    }
 }
 
 function openEditModal(id) {
-    const row = Array.from(todoList.children).find(row => row.cells[0].innerText == id);
+    currentEditId = id;
+    const row = document.querySelector(`tr[data-status="Pending"]`) || document.querySelector(`tr[data-status="Completed"]`);
     if (row) {
-        currentEditId = id;
-        editTaskInput.value = row.cells[1].innerText;
-        editPriorityInput.value = row.cells[4].innerText;
-        editModal.classList.remove('hidden'); // Show the modal
+        const taskText = row.cells[1].innerText;
+        const taskPriority = row.cells[4].innerText;
+        editTaskInput.value = taskText;
+        editPriorityInput.value = taskPriority;
+        editModal.classList.remove('hidden');
     }
 }
 
 saveBtn.addEventListener('click', () => {
-    const row = Array.from(todoList.children).find(row => row.cells[0].innerText == currentEditId);
-    if (row) {
-        row.cells[1].innerText = editTaskInput.value;
-        row.cells[4].innerText = editPriorityInput.value;
-        editModal.classList.add('hidden'); // Hide the modal
+    const updatedText = editTaskInput.value.trim();
+    const updatedPriority = editPriorityInput.value;
+
+    if (updatedText && currentEditId) {
+        const row = document.querySelector(`tr[data-status="Pending"]`) || document.querySelector(`tr[data-status="Completed"]`);
+        if (row) {
+            row.cells[1].innerText = updatedText;
+            row.cells[4].innerText = updatedPriority;
+        }
+        closeEditModal();
     }
 });
 
-closeBtn.addEventListener('click', () => {
-    editModal.classList.add('hidden'); // Hide the modal
-});
+closeBtn.addEventListener('click', closeEditModal);
+function closeEditModal() {
+    editModal.classList.add('hidden');
+    currentEditId = null;
+}
 
 function openDeleteModal(id) {
     taskToDeleteId = id;
-    deleteModal.classList.remove('hidden'); // Show delete confirmation modal
+    deleteModal.classList.remove('hidden');
 }
 
 confirmDeleteBtn.addEventListener('click', () => {
-    removeTask(taskToDeleteId);
-    deleteModal.classList.add('hidden'); // Hide the modal
-});
-
-cancelDeleteBtn.addEventListener('click', () => {
-    deleteModal.classList.add('hidden'); // Hide the modal
-});
-
-function removeTask(id) {
-    const row = Array.from(todoList.children).find(row => row.cells[0].innerText == id);
+    const row = document.querySelector(`tr[data-status="Pending"]`) || document.querySelector(`tr[data-status="Completed"]`);
     if (row) {
-        todoList.removeChild(row);
+        row.remove();
     }
+    closeDeleteModal();
+});
+
+cancelDeleteBtn.addEventListener('click', closeDeleteModal);
+function closeDeleteModal() {
+    deleteModal.classList.add('hidden');
+    taskToDeleteId = null;
+}
+
+// Filtering tasks based on status and priority
+statusFilter.addEventListener('change', filterTasks);
+priorityFilter.addEventListener('change', filterTasks);
+
+function filterTasks() {
+    const statusValue = statusFilter.value;
+    const priorityValue = priorityFilter.value;
+
+    const rows = todoList.querySelectorAll('tr');
+    rows.forEach(row => {
+        const status = row.getAttribute('data-status');
+        const priority = row.cells[4].innerText;
+
+        const showByStatus = (statusValue === "All" || status === statusValue);
+        const showByPriority = (priorityValue === "All" || priority === priorityValue);
+
+        if (showByStatus && showByPriority) {
+            row.classList.remove('hidden');
+        } else {
+            row.classList.add('hidden');
+        }
+    });
 }

@@ -5,13 +5,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>To-Do List</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="src/main.css" rel="stylesheet">
     <link href='https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css' rel='stylesheet'>
 </head>
 
 <body class="bg-gray-100 p-6">
     <div class="max-w-4xl mx-auto bg-white p-5 rounded-lg shadow-md">
         <h1 class="text-xl font-bold text-center mb-4">To-Do List</h1>
+
+        <!-- Filters -->
+        <div class="flex justify-between mb-4">
+            <div>
+                <label for="status-filter" class="mr-2">Status:</label>
+                <select id="status-filter"
+                    class="p-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300">
+                    <option value="All">All</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Pending">Pending</option>
+                </select>
+            </div>
+            <div>
+                <label for="priority-filter" class="mr-2">Priority:</label>
+                <select id="priority-filter"
+                    class="p-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300">
+                    <option value="All">All</option>
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Task Input -->
         <form id="todo-form" class="flex mb-4">
             <input type="text" id="task-input"
                 class="flex-grow p-2 border rounded-l-lg focus:outline-none focus:ring focus:ring-blue-300"
@@ -24,6 +49,8 @@
             </select>
             <button type="submit" class="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 ml-2">Add</button>
         </form>
+
+        <!-- Task Table -->
         <table class="min-w-full border border-gray-300">
             <thead>
                 <tr class="bg-gray-200 text-gray-700">
@@ -75,7 +102,7 @@
         </div>
     </div>
 
-    <script src="src/script.js"></script>
+    <script src="./src/script.js"></script>
 </body>
 
 </html>
